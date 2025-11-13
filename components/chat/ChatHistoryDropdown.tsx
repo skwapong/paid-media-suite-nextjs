@@ -106,13 +106,10 @@ const ChatHistoryDropdown: React.FC<ChatHistoryDropdownProps> = ({ onLoadChat })
   }
 
   return (
-    <div css={css`
-      position: relative;
-      width: 100%;
-    `}>
-      {/* Dropdown Trigger */}
-      <div
-        onClick={() => setIsOpen(!isOpen)}
+    <>
+      {/* Modal Trigger Button */}
+      <button
+        onClick={() => setIsOpen(true)}
         css={css`
           background-color: #ffffff;
           border: 1px solid #DCE1EA;
@@ -124,6 +121,7 @@ const ChatHistoryDropdown: React.FC<ChatHistoryDropdownProps> = ({ onLoadChat })
           gap: 12px;
           cursor: pointer;
           transition: all 0.2s;
+          width: 100%;
           &:hover {
             background-color: #F9FBFF;
             border-color: #6F2EFF;
@@ -138,31 +136,129 @@ const ChatHistoryDropdown: React.FC<ChatHistoryDropdownProps> = ({ onLoadChat })
           color: #212327;
           flex: 1;
           line-height: 1.4;
+          text-align: left;
         `}>
-          Select Agent
+          Chat History
         </span>
-        <ChevronIcon isOpen={isOpen} />
-      </div>
+        <ChevronIcon isOpen={false} />
+      </button>
 
-      {/* Dropdown Menu */}
+      {/* Modal Overlay and Content */}
       {isOpen && (
-        <div css={css`
-          position: absolute;
-          top: calc(100% + 8px);
-          left: 0;
-          right: 0;
-          background-color: #ffffff;
-          border: 1px solid #DCE1EA;
-          border-radius: 8px;
-          box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.12);
-          max-height: 400px;
-          overflow-y: auto;
-          z-index: 1000;
-        `}>
+        <>
+          {/* Backdrop */}
+          <div
+            onClick={() => {
+              setIsOpen(false)
+              setSelectedAgentId(null)
+            }}
+            css={css`
+              position: fixed;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background-color: rgba(0, 0, 0, 0.5);
+              z-index: 9998;
+              animation: fadeIn 0.2s ease-out;
+              @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+              }
+            `}
+          />
+
+          {/* Modal */}
+          <div css={css`
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0px 20px 60px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: hidden;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.3s ease-out;
+            @keyframes slideIn {
+              from {
+                opacity: 0;
+                transform: translate(-50%, -45%);
+              }
+              to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+              }
+            }
+          `}
+          onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div css={css`
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              padding: 24px;
+              border-bottom: 1px solid #DCE1EA;
+            `}>
+              <div css={css`
+                display: flex;
+                align-items: center;
+                gap: 12px;
+              `}>
+                <HistoryIcon />
+                <h2 css={css`
+                  font-family: 'Figtree', sans-serif;
+                  font-weight: 600;
+                  font-size: 20px;
+                  color: #212327;
+                  margin: 0;
+                `}>
+                  Chat History
+                </h2>
+              </div>
+              <button
+                onClick={() => {
+                  setIsOpen(false)
+                  setSelectedAgentId(null)
+                }}
+                css={css`
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 32px;
+                  height: 32px;
+                  background-color: transparent;
+                  border: none;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  transition: all 0.2s;
+                  color: #878F9E;
+
+                  &:hover {
+                    background-color: #F3EEFF;
+                    color: #6F2EFF;
+                  }
+                `}
+              >
+                <CloseIcon />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div css={css`
+              flex: 1;
+              overflow-y: auto;
+            `}>
           {/* Agent Selection */}
           {!selectedAgentId && (
             <div css={css`
-              padding: 12px;
+              padding: 24px;
             `}>
               <div css={css`
                 font-family: 'Figtree', sans-serif;
@@ -224,7 +320,7 @@ const ChatHistoryDropdown: React.FC<ChatHistoryDropdownProps> = ({ onLoadChat })
           {/* Chat History List */}
           {selectedAgentId && (
             <div css={css`
-              padding: 12px;
+              padding: 24px;
             `}>
               <div css={css`
                 display: flex;
@@ -394,9 +490,11 @@ const ChatHistoryDropdown: React.FC<ChatHistoryDropdownProps> = ({ onLoadChat })
               )}
             </div>
           )}
-        </div>
+            </div>
+          </div>
+        </>
       )}
-    </div>
+    </>
   )
 }
 
@@ -420,6 +518,12 @@ const ChevronIcon = ({ isOpen }: { isOpen: boolean }) => (
     `}
   >
     <path d="M4 6L8 10L12 6" stroke="#AEAEAE" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
+const CloseIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 )
 
