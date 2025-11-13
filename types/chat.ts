@@ -1,37 +1,31 @@
-export interface ChatMessage {
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: string;
+export interface ChatHistoryItem {
+  id: string
+  type: 'chats'
+  attributes: {
+    createdAt: string
+    updatedAt: string
+    firstInputContent: string
+    lastConversationAt: string
+    agentId?: string
+    agentName?: string
+  }
 }
 
-export interface TDChatResponse {
-  data: {
-    id: string;
-    type: string;
-    attributes: {
-      agentId: string;
-      createdAt: string;
-      updatedAt: string;
-    };
-  };
+export interface ChatHistoryResponse {
+  data: ChatHistoryItem[]
+  meta?: {
+    pagination?: {
+      total: number
+      count: number
+      offset: number
+      limit: number
+    }
+  }
 }
 
-export interface StreamChunk {
-  user_content?: string;
-  content?: string;
-  tool_call?: {
-    id: string;
-    functionName: string;
-    functionArguments: string;
-    targetAgent?: {
-      id: string;
-      name: string;
-    };
-  };
-  tool?: {
-    id: string;
-    content: string;
-    status: string;
-  };
-  at: string;
+export interface ChatHistoryParams {
+  agentId?: string
+  limit?: number
+  offset?: number
+  sort?: string
 }

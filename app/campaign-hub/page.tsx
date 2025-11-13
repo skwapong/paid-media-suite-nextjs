@@ -1,12 +1,12 @@
 'use client';
 
 import AppLayoutClient from '@/components/AppLayoutClient';
-import HomePage from '@/components/home/HomePage';
+import CampaignHub from '@/components/campaign/CampaignHub';
 
-export default function Home() {
+export default function CampaignHubPage() {
   return (
     <AppLayoutClient>
-      <HomePage />
+      <CampaignHub />
     </AppLayoutClient>
   );
 }
