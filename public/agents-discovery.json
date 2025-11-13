@@ -1,0 +1,157 @@
+{
+  "orchestrator": {
+    "id": "orchestrator",
+    "agent_id": "019927a6-7529-755e-8c3d-f4f048da3b89",
+    "name": "Agent Orchestrator",
+    "description": "Multi-agent coordinator and conversation manager",
+    "capabilities": [
+      "Multi-Agent Coordination",
+      "Conversation Management",
+      "Tool Orchestration"
+    ],
+    "outputs": [
+      ":doc:",
+      ":table:",
+      ":drawio:",
+      ":graphviz:",
+      ":plotly:",
+      ":slide:",
+      ":sheet:",
+      ":html:"
+    ],
+    "usage_instructions": "Central coordinator for managing conversations and delegating tasks to specialized agents.",
+    "status": "offline",
+    "version": "1.0.0"
+  },
+  "agents": [
+    {
+      "id": "campaign-strategist-planner-agent",
+      "agent_id": "019a555a-2d62-7d98-89d7-0ec6dfcb0fdf",
+      "name": "Campaign Building",
+      "description": "Campaign Strategist & Planner to help market team simplify their process to develop a campaign plan that is ready for execution",
+      "capabilities": [
+        "Campaign Planning",
+        "Campaign Strategy",
+        "Budget Allocation",
+        "Creative Strategy"
+      ],
+      "outputs": [
+        ":doc:",
+        ":table:",
+        ":graphviz:"
+      ],
+      "usage_instructions": "Helps marketing teams develop comprehensive campaign plans ready for execution.",
+      "status": "online",
+      "version": "1.0.0"
+    },
+    {
+      "id": "campaign-optimizer-agent",
+      "agent_id": "pending-001",
+      "name": "Campaign Optimization",
+      "description": "Analyzes campaign performance and provides optimization recommendations for improved ROI",
+      "capabilities": [
+        "Performance Analysis",
+        "A/B Testing",
+        "Budget Optimization",
+        "Bid Management"
+      ],
+      "outputs": [
+        ":plotly:",
+        ":table:",
+        ":doc:"
+      ],
+      "usage_instructions": "Analyzes running campaigns and suggests optimizations based on performance data.",
+      "status": "pending",
+      "version": "1.0.0"
+    },
+    {
+      "id": "audience-insights-agent",
+      "agent_id": "pending-002",
+      "name": "Audience Insights",
+      "description": "Provides deep insights into target audiences, behaviors, and engagement patterns",
+      "capabilities": [
+        "Audience Segmentation",
+        "Behavioral Analysis",
+        "Demographic Insights",
+        "Engagement Tracking"
+      ],
+      "outputs": [
+        ":plotly:",
+        ":table:",
+        ":drawio:",
+        ":doc:"
+      ],
+      "usage_instructions": "Analyzes audience data to provide actionable insights for targeting and personalization.",
+      "status": "pending",
+      "version": "1.0.0"
+    },
+    {
+      "id": "creative-generator-agent",
+      "agent_id": "pending-003",
+      "name": "Creative Generator",
+      "description": "Generates ad creative concepts, copy variations, and visual recommendations",
+      "capabilities": [
+        "Ad Copy Generation",
+        "Creative Concepts",
+        "Visual Recommendations",
+        "Message Testing"
+      ],
+      "outputs": [
+        ":doc:",
+        ":image:",
+        ":table:"
+      ],
+      "usage_instructions": "Generates creative content and variations for paid media campaigns.",
+      "status": "pending",
+      "version": "1.0.0"
+    },
+    {
+      "id": "performance-reporter-agent",
+      "agent_id": "pending-004",
+      "name": "Campaign Reporting",
+      "description": "Creates comprehensive reports and dashboards for campaign performance tracking",
+      "capabilities": [
+        "Report Generation",
+        "Dashboard Creation",
+        "KPI Tracking",
+        "Trend Analysis"
+      ],
+      "outputs": [
+        ":plotly:",
+        ":table:",
+        ":doc:",
+        ":slide:"
+      ],
+      "usage_instructions": "Generates detailed performance reports and visualizations for stakeholders.",
+      "status": "pending",
+      "version": "1.0.0"
+    },
+    {
+      "id": "budget-allocator-agent",
+      "agent_id": "pending-005",
+      "name": "Budget Allocator",
+      "description": "Optimizes budget allocation across channels, campaigns, and time periods",
+      "capabilities": [
+        "Budget Planning",
+        "Channel Mix Optimization",
+        "Spend Forecasting",
+        "ROI Projection"
+      ],
+      "outputs": [
+        ":table:",
+        ":plotly:",
+        ":doc:"
+      ],
+      "usage_instructions": "Analyzes performance data to recommend optimal budget allocation strategies.",
+      "status": "pending",
+      "version": "1.0.0"
+    }
+  ],
+  "metadata": {
+    "last_updated": "2025-11-07T00:36:49.093Z",
+    "total_agents": 6,
+    "online_agents": 1,
+    "discovery_endpoint": "https://llm-api.treasuredata.com/v1/agents/discovery",
+    "refresh_interval": 30000
+  }
+}
