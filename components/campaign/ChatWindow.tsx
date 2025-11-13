@@ -4,6 +4,7 @@ import TDLLMService, { type FileAttachment as TDFileAttachment } from '../../ser
 import FileUpload, { FileAttachment } from '../chat/FileUpload'
 import { type UploadedFile, cleanupFileUrls } from '../../utils/fileUpload'
 import ToolResponseRenderer from '../chat/ToolResponseRenderer'
+import MessageExportMenu from '../chat/MessageExportMenu'
 
 // Helper function to count tokens (rough estimate: ~4 characters per token)
 const estimateTokens = (text: string): number => {
@@ -1217,6 +1218,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                   `}>
                     {msg.timestamp.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                   </span>
+                  {msg.type === 'assistant' && !msg.isThinking && msg.content !== 'GREETING' && (
+                    <div css={css`margin-left: auto;`}>
+                      <MessageExportMenu message={msg} />
+                    </div>
+                  )}
                 </div>
 
                 {/* Message Container */}
