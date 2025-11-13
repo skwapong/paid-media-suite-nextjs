@@ -15,9 +15,18 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      const validToken = process.env.NEXT_PUBLIC_ACCESS_TOKEN || 'demo-access-2024'
+      // Call the server-side API to validate password
+      const response = await fetch('/api/auth/validate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password }),
+      })
 
-      if (password === validToken) {
+      const data = await response.json()
+
+      if (data.valid) {
         // Set cookie
         document.cookie = `auth-token=${password}; path=/; max-age=${60 * 60 * 24 * 30}` // 30 days
 
