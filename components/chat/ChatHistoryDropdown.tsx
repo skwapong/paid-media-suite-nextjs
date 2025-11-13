@@ -11,22 +11,65 @@ interface ChatHistoryDropdownProps {
 const ChatHistoryDropdown: React.FC<ChatHistoryDropdownProps> = ({ onLoadChat }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [chatHistory, setChatHistory] = useState<ChatHistoryItem[]>([])
+  const [filteredHistory, setFilteredHistory] = useState<ChatHistoryItem[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all')
   const { data: agentsData } = useAgents()
 
   const onlineAgents = agentsData?.agents?.filter(agent => agent.status === 'online') || []
 
+  // Load chat history when agent is selected
   useEffect(() => {
     if (isOpen && selectedAgentId) {
       loadChatHistory(selectedAgentId)
     }
   }, [isOpen, selectedAgentId])
 
+  // Filter chat history based on search and date filters
+  useEffect(() => {
+    let filtered = [...chatHistory]
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(chat =>
+        ChatHistoryService.parseClientInput(chat.attributes.firstInputContent).toLowerCase().includes(query)
+      )
+    }
+
+    // Apply date filter
+    if (dateFilter !== 'all') {
+      const now = new Date()
+      const filterDate = new Date()
+
+      switch (dateFilter) {
+        case 'today':
+          filterDate.setHours(0, 0, 0, 0)
+          break
+        case 'week':
+          filterDate.setDate(now.getDate() - 7)
+          break
+        case 'month':
+          filterDate.setMonth(now.getMonth() - 1)
+          break
+      }
+
+      filtered = filtered.filter(chat => {
+        const chatDate = new Date(chat.attributes.lastConversationAt || chat.attributes.createdAt)
+        return chatDate >= filterDate
+      })
+    }
+
+    setFilteredHistory(filtered)
+  }, [chatHistory, searchQuery, dateFilter])
+
   const loadChatHistory = async (agentId: string) => {
     setIsLoading(true)
     try {
-      const response = await ChatHistoryService.getAgentChatHistory(agentId, 30)
+      // Increase limit to 100
+      const response = await ChatHistoryService.getAgentChatHistory(agentId, 100)
       setChatHistory(response.data || [])
     } catch (error) {
       console.error('Failed to load chat history:', error)
@@ -198,7 +241,7 @@ const ChatHistoryDropdown: React.FC<ChatHistoryDropdownProps> = ({ onLoadChat })
                   text-transform: uppercase;
                   letter-spacing: 0.5px;
                 `}>
-                  Recent Conversations
+                  Recent Conversations {filteredHistory.length > 0 && `(${filteredHistory.length})`}
                 </div>
                 <button
                   onClick={() => setSelectedAgentId(null)}
@@ -220,6 +263,72 @@ const ChatHistoryDropdown: React.FC<ChatHistoryDropdownProps> = ({ onLoadChat })
                 </button>
               </div>
 
+              {/* Search Input */}
+              <div css={css`
+                padding: 0 12px 12px 12px;
+              `}>
+                <input
+                  type="text"
+                  placeholder="Search conversations..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  css={css`
+                    width: 100%;
+                    padding: 10px 12px;
+                    border: 1px solid #DCE1EA;
+                    border-radius: 6px;
+                    font-family: 'Figtree', sans-serif;
+                    font-size: 14px;
+                    color: #212327;
+                    transition: all 0.2s;
+
+                    &:focus {
+                      outline: none;
+                      border-color: #6F2EFF;
+                      background-color: #F9FBFF;
+                    }
+
+                    &::placeholder {
+                      color: #878F9E;
+                    }
+                  `}
+                />
+              </div>
+
+              {/* Date Filters */}
+              <div css={css`
+                padding: 0 12px 12px 12px;
+                display: flex;
+                gap: 8px;
+              `}>
+                {(['all', 'today', 'week', 'month'] as const).map((filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => setDateFilter(filter)}
+                    css={css`
+                      flex: 1;
+                      padding: 8px 12px;
+                      background-color: ${dateFilter === filter ? '#6F2EFF' : '#F9FBFF'};
+                      color: ${dateFilter === filter ? '#FFFFFF' : '#212327'};
+                      border: 1px solid ${dateFilter === filter ? '#6F2EFF' : '#DCE1EA'};
+                      border-radius: 6px;
+                      font-family: 'Figtree', sans-serif;
+                      font-size: 12px;
+                      font-weight: 500;
+                      cursor: pointer;
+                      transition: all 0.2s;
+
+                      &:hover {
+                        background-color: ${dateFilter === filter ? '#5A25CC' : '#F3EEFF'};
+                        border-color: #6F2EFF;
+                      }
+                    `}
+                  >
+                    {filter === 'all' ? 'All' : filter === 'today' ? 'Today' : filter === 'week' ? 'Week' : 'Month'}
+                  </button>
+                ))}
+              </div>
+
               {isLoading ? (
                 <div css={css`
                   padding: 24px;
@@ -229,54 +338,59 @@ const ChatHistoryDropdown: React.FC<ChatHistoryDropdownProps> = ({ onLoadChat })
                 `}>
                   Loading...
                 </div>
-              ) : chatHistory.length === 0 ? (
+              ) : filteredHistory.length === 0 ? (
                 <div css={css`
                   padding: 24px;
                   text-align: center;
                   color: #878F9E;
                   font-size: 14px;
                 `}>
-                  No chat history found
+                  {chatHistory.length === 0 ? 'No chat history found' : 'No conversations match your filters'}
                 </div>
               ) : (
-                chatHistory.map((chat) => (
-                  <div
-                    key={chat.id}
-                    onClick={() => handleChatSelect(chat)}
-                    css={css`
-                      padding: 12px;
-                      border-radius: 6px;
-                      cursor: pointer;
-                      transition: background-color 0.2s;
-                      border-bottom: 1px solid #F0F0F0;
-                      &:last-child {
-                        border-bottom: none;
-                      }
-                      &:hover {
-                        background-color: #F3EEFF;
-                      }
-                    `}
-                  >
-                    <div css={css`
-                      font-family: 'Figtree', sans-serif;
-                      font-size: 14px;
-                      color: #212327;
-                      margin-bottom: 4px;
-                      overflow: hidden;
-                      text-overflow: ellipsis;
-                      white-space: nowrap;
-                    `}>
-                      {ChatHistoryService.parseClientInput(chat.attributes.firstInputContent)}
+                <div css={css`
+                  max-height: 300px;
+                  overflow-y: auto;
+                `}>
+                  {filteredHistory.map((chat) => (
+                    <div
+                      key={chat.id}
+                      onClick={() => handleChatSelect(chat)}
+                      css={css`
+                        padding: 12px;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        transition: background-color 0.2s;
+                        border-bottom: 1px solid #F0F0F0;
+                        &:last-child {
+                          border-bottom: none;
+                        }
+                        &:hover {
+                          background-color: #F3EEFF;
+                        }
+                      `}
+                    >
+                      <div css={css`
+                        font-family: 'Figtree', sans-serif;
+                        font-size: 14px;
+                        color: #212327;
+                        margin-bottom: 4px;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                      `}>
+                        {ChatHistoryService.parseClientInput(chat.attributes.firstInputContent)}
+                      </div>
+                      <div css={css`
+                        font-family: 'Figtree', sans-serif;
+                        font-size: 12px;
+                        color: #878F9E;
+                      `}>
+                        {formatDate(chat.attributes.lastConversationAt || chat.attributes.createdAt)}
+                      </div>
                     </div>
-                    <div css={css`
-                      font-family: 'Figtree', sans-serif;
-                      font-size: 12px;
-                      color: #878F9E;
-                    `}>
-                      {formatDate(chat.attributes.lastConversationAt || chat.attributes.createdAt)}
-                    </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               )}
             </div>
           )}
