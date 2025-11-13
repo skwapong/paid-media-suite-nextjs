@@ -1,6 +1,6 @@
 import { css } from '@emotion/react'
 import { useState } from 'react'
-import ChatHistoryDropdown from '../chat/ChatHistoryDropdown'
+import ChatHistoryModal from '../chat/ChatHistoryModal'
 
 interface SecondaryNavigationProps {
   onLoadChat?: (chatId: string) => void
@@ -15,7 +15,7 @@ const SecondaryNavigation: React.FC<SecondaryNavigationProps> = ({
   isCollapsed = false,
   onToggleCollapse
 }) => {
-  const [isChatHistoryExpanded, setIsChatHistoryExpanded] = useState(false)
+  const [isChatHistoryModalOpen, setIsChatHistoryModalOpen] = useState(false)
 
   return (
     <aside css={css`
@@ -168,56 +168,34 @@ const SecondaryNavigation: React.FC<SecondaryNavigationProps> = ({
               </div>
 
               {/* Chat History */}
-              <div css={css`
-                display: flex;
-                flex-direction: column;
-                width: 100%;
-              `}>
-                <div css={css`
+              <div
+                css={css`
                   background-color: #ffffff;
                   border-radius: 8px;
                   min-height: 48px;
                   display: flex;
                   align-items: center;
                   padding: 0 16px;
-                  gap: 8px;
+                  gap: 12px;
                   cursor: pointer;
-                  transition: background-color 0.2s;
+                  transition: all 0.2s;
                   &:hover {
                     background-color: #F9FBFF;
+                    border: 1px solid #6F2EFF;
                   }
                 `}
-                onClick={() => setIsChatHistoryExpanded(!isChatHistoryExpanded)}
-                >
-                  <div css={css`
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                    flex: 1;
-                  `}>
-                    <ChatHistoryIcon />
-                    <span css={css`
-                      font-family: 'Figtree', sans-serif;
-                      font-weight: 400;
-                      font-size: 16px;
-                      color: #212327;
-                      line-height: 1.4;
-                    `}>
-                      Chat History
-                    </span>
-                  </div>
-                  <DownArrowIcon isExpanded={isChatHistoryExpanded} />
-                </div>
-
-                {/* Chat History Dropdown Content */}
-                {isChatHistoryExpanded && (
-                  <div css={css`
-                    padding-left: 16px;
-                    margin-top: 8px;
-                  `}>
-                    <ChatHistoryDropdown onLoadChat={onLoadChat} />
-                  </div>
-                )}
+                onClick={() => setIsChatHistoryModalOpen(true)}
+              >
+                <ChatHistoryIcon />
+                <span css={css`
+                  font-family: 'Figtree', sans-serif;
+                  font-weight: 400;
+                  font-size: 16px;
+                  color: #212327;
+                  line-height: 1.4;
+                `}>
+                  Chat History
+                </span>
               </div>
 
               {/* Task History - Inactive */}
@@ -254,6 +232,7 @@ const SecondaryNavigation: React.FC<SecondaryNavigationProps> = ({
             {/* Chat History - Collapsed */}
             <div
               title="Chat History"
+              onClick={() => setIsChatHistoryModalOpen(true)}
               css={css`
                 background-color: #ffffff;
                 border-radius: 8px;
@@ -263,9 +242,10 @@ const SecondaryNavigation: React.FC<SecondaryNavigationProps> = ({
                 justify-content: center;
                 padding: 12px;
                 cursor: pointer;
-                transition: background-color 0.2s;
+                transition: all 0.2s;
                 &:hover {
                   background-color: #F9FBFF;
+                  border: 1px solid #6F2EFF;
                 }
               `}
             >
@@ -321,6 +301,13 @@ const SecondaryNavigation: React.FC<SecondaryNavigationProps> = ({
           <CollapseIcon isCollapsed={isCollapsed} />
         </button>
       )}
+
+      {/* Chat History Modal */}
+      <ChatHistoryModal
+        isOpen={isChatHistoryModalOpen}
+        onClose={() => setIsChatHistoryModalOpen(false)}
+        onLoadChat={onLoadChat}
+      />
     </aside>
   )
 }
