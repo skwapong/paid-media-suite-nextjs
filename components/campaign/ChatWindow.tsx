@@ -5,6 +5,7 @@ import FileUpload, { FileAttachment } from '../chat/FileUpload'
 import { type UploadedFile, cleanupFileUrls } from '../../utils/fileUpload'
 import ToolResponseRenderer from '../chat/ToolResponseRenderer'
 import MessageExportMenu from '../chat/MessageExportMenu'
+import MessageActions from '../chat/MessageActions'
 import ExportMenu from '../chat/ExportMenu'
 
 // Helper function to count tokens (rough estimate: ~4 characters per token)
@@ -1184,6 +1185,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             return (
               <div
                 key={`msg-${msg.timestamp.getTime()}-${index}`}
+                className="message-container"
                 css={css`
                   display: flex;
                   flex-direction: column;
@@ -1233,14 +1235,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                   `}>
                     {msg.timestamp.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                   </span>
-                  <MessageExportMenu
-                    message={{
-                      type: msg.type,
-                      content: msg.content,
-                      timestamp: msg.timestamp,
-                      activities: msg.toolCalls?.map(tc => tc.function_name || 'Unknown') || undefined
-                    }}
-                  />
                 </div>
 
                 {/* Message Container */}
@@ -1282,6 +1276,27 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                     `}>
                       {formatMessageContent(msg.content)}
                     </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div css={css`
+                    padding-left: 4px;
+                  `}>
+                    <MessageActions
+                      message={{
+                        type: msg.type,
+                        content: msg.content,
+                        timestamp: msg.timestamp,
+                        activities: msg.toolCalls?.map(tc => tc.function_name || 'Unknown') || undefined
+                      }}
+                      showRegenerate={msg.type === 'assistant' && index === messages.length - 1}
+                      onRegenerate={() => {
+                        // Remove last assistant message and regenerate
+                        setMessages(messages.slice(0, -1))
+                        // Trigger regeneration by submitting the last user message
+                        handleSubmit()
+                      }}
+                    />
                   </div>
                 </div>
               </div>
